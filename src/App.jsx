@@ -4,9 +4,9 @@ import 'react-calendar/dist/Calendar.css'
 import './App.css'
 
 const WORKPLACE_OPTIONS = [
-  { label: 'On Campus', value: 'on-campus', color: '#e3f2fd', border: '#90caf9' },
-  { label: 'Remote', value: 'remote', color: '#e8f5e9', border: '#81c784' },
-  { label: 'Out of Office', value: 'out-of-office', color: '#fff3e0', border: '#ffb74d' },
+  { label: 'On Campus', value: 'on-campus', color: '#bbdefb', border: '#90caf9', text: '#222' }, // Softer blue
+  { label: 'Remote', value: 'remote', color: '#c8e6c9', border: '#81c784', text: '#222' },      // Softer green
+  { label: 'Out of Office', value: 'out-of-office', color: '#ffe0b2', border: '#ffb74d', text: '#222' }, // Softer orange
 ];
 
 function getDateKey(date) {
@@ -43,6 +43,42 @@ function App() {
     return false;
   };
 
+  // Color code calendar tiles based on workplaceMap
+  const tileContent = ({ date, view }) => {
+    if (view === 'month') {
+      const key = getDateKey(date);
+      const value = workplaceMap[key];
+      if (value) {
+        const opt = WORKPLACE_OPTIONS.find(o => o.value === value);
+        return (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: opt.color,
+            opacity: 0.45,
+            zIndex: 0,
+            borderRadius: 6,
+          }} />
+        );
+      }
+    }
+    return null;
+  };
+
+  // Add a class to the tile for stacking background and text
+  const tileClassName = ({ date, view }) => {
+    if (view === 'month') {
+      const key = getDateKey(date);
+      if (workplaceMap[key]) {
+        return 'wfh-tile-has-bg';
+      }
+    }
+    return '';
+  };
+
   const handleWorkplaceClick = (value) => {
     const key = getDateKey(date);
     setWorkplaceMap(prev => ({ ...prev, [key]: value }));
@@ -61,6 +97,8 @@ function App() {
           view={calendarView}
           onViewChange={({ activeStartDate, view }) => setCalendarView(view)}
           tileDisabled={tileDisabled}
+          tileContent={tileContent}
+          tileClassName={tileClassName}
         />
         <div style={{ minWidth: 200, padding: '1rem', border: '1px solid #eee', borderRadius: 8, background: '#fafbfc' }}>
           <div style={{ fontWeight: 'bold', marginBottom: 16 }}>Where did you work?</div>
@@ -72,26 +110,38 @@ function App() {
                   padding: '0.5rem',
                   fontWeight: 'bold',
                   background: opt.color,
-                  border: `2px solid ${selectedWorkplace === opt.value ? '#1976d2' : opt.border}`,
+                  color: opt.text,
+                  border: 'none',
                   borderRadius: 4,
                   cursor: 'pointer',
-                  outline: selectedWorkplace === opt.value ? '2px solid #1976d2' : 'none',
+                  boxShadow: selectedWorkplace === opt.value ? '0 0 0 2px #1976d2' : 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  transition: 'box-shadow 0.2s',
                 }}
                 onClick={() => handleWorkplaceClick(opt.value)}
                 aria-pressed={selectedWorkplace === opt.value}
               >
                 <span>{opt.label}</span>
                 {selectedWorkplace === opt.value && (
-                  <span style={{ color: 'green', marginLeft: 8, fontSize: 20 }} aria-label="selected">✔</span>
+                  <span style={{ color: 'limegreen', marginLeft: 8, fontSize: 20 }} aria-label="selected">✔</span>
                 )}
               </button>
             ))}
           </div>
         </div>
       </div>
+      <style>{`
+        .wfh-tile-has-bg {
+          position: relative;
+          z-index: 1;
+        }
+        .react-calendar__tile {
+          position: relative;
+          z-index: 2;
+        }
+      `}</style>
     </>
   )
 }
