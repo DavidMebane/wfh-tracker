@@ -14,18 +14,16 @@ function getDateKey(date) {
 }
 
 function App() {
+  // Initialize workplaceMap from localStorage for true persistence
+  const [workplaceMap, setWorkplaceMap] = useState(() => {
+    const data = localStorage.getItem('workplaceMap');
+    return data ? JSON.parse(data) : {};
+  });
   const [date, setDate] = useState(new Date())
   const [calendarView, setCalendarView] = useState('month')
-  const [workplaceMap, setWorkplaceMap] = useState({})
   const [selectedWorkplace, setSelectedWorkplace] = useState('')
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const data = localStorage.getItem('workplaceMap');
-    if (data) setWorkplaceMap(JSON.parse(data));
-  }, []);
-
-  // Update selectedWorkplace when date changes
+  // Update selectedWorkplace when date or workplaceMap changes
   useEffect(() => {
     const key = getDateKey(date);
     setSelectedWorkplace(workplaceMap[key] || '');
