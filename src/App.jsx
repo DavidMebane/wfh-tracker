@@ -132,6 +132,29 @@ function App() {
           </div>
         </div>
       </div>
+      <section style={{ maxWidth: 480, margin: '2rem auto 0 auto', padding: '1.5rem', border: '1px solid #eee', borderRadius: 8, background: '#f7f7fa' }}>
+        <h2 style={{ fontSize: '1.3rem', marginBottom: 12 }}>Workplace Statistics</h2>
+        {(() => {
+          const values = Object.values(workplaceMap).filter(Boolean);
+          const total = values.length;
+          if (!total) return <div style={{ color: '#888' }}>No data yet.</div>;
+          return (
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {WORKPLACE_OPTIONS.map(opt => {
+                const count = values.filter(v => v === opt.value).length;
+                const percent = ((count / total) * 100).toFixed(1);
+                return (
+                  <li key={opt.value} style={{ marginBottom: 8, display: 'flex', alignItems: 'center' }}>
+                    <span style={{ display: 'inline-block', width: 16, height: 16, background: opt.color, borderRadius: 4, marginRight: 8, border: `1px solid ${opt.border}` }}></span>
+                    <span style={{ flex: 1 }}>{opt.label}</span>
+                    <span style={{ fontWeight: 'bold', minWidth: 48, textAlign: 'right' }}>{percent}%</span>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        })()}
+      </section>
       <style>{`
         .wfh-tile-has-bg {
           position: relative;
